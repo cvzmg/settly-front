@@ -1,16 +1,22 @@
 "use client"
 import React, { useState, useRef, useEffect } from 'react';
-import Draggable from 'react-draggable';
-import { ResizableBox } from 'react-resizable';
+// Import the specific types needed from the libraries
+import Draggable, { DraggableEvent, DraggableData } from 'react-draggable';
+import { ResizableBox, ResizeCallbackData } from 'react-resizable';
 import 'react-resizable/css/styles.css';
 
-const ContentCard = ({ children }) => {
+// Define the type for the component's props
+interface ContentCardProps {
+  children: React.ReactNode;
+}
+
+const ContentCard: React.FC<ContentCardProps> = ({ children }) => {
   // State for both size and position
   const [size, setSize] = useState({ width: 400, height: 300 });
   const [position, setPosition] = useState({ x: 0, y: 0 });
 
   // Ref for the draggable element and parent size
-  const nodeRef = useRef(null);
+  const nodeRef = useRef<HTMLDivElement>(null);
   const [parentSize, setParentSize] = useState({ width: 0, height: 0 });
 
   // Hook to get parent dimensions and set a responsive initial size
@@ -24,31 +30,32 @@ const ContentCard = ({ children }) => {
         });
 
         // Ensure initial size is not larger than the parent
-        const initialWidth = Math.min(size.width, parent.clientWidth - 20); // -20 for padding
+        const initialWidth = Math.min(size.width, parent.clientWidth - 20);
         const initialHeight = Math.min(size.height, parent.clientHeight - 20);
         setSize({ width: initialWidth, height: initialHeight });
         
         // Center the component initially
         setPosition({
           x: (parent.clientWidth - initialWidth) / 2,
-          y: (parent.clientHeight - initialHeight) / 4, // A bit higher than center
+          y: (parent.clientHeight - initialHeight) / 4,
         });
       }
     }
-  }, []); // Empty dependency array ensures this runs only once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // This effect should only run once on mount to set the initial state.
 
-  // Update size state on resize
-  const onResize = (event, { node, size, handle }) => {
+  // Update size state on resize with proper types
+  const onResize = (event: React.SyntheticEvent, { size }: ResizeCallbackData) => {
     setSize({ width: size.width, height: size.height });
   };
   
-  // Update position state on drag
-  const onDrag = (event, data) => {
+  // Update position state on drag with proper types
+  const onDrag = (event: DraggableEvent, data: DraggableData) => {
     setPosition({ x: data.x, y: data.y });
   };
   
   // Calculate dynamic max constraints based on current position
-  const maxConstraints = [
+  const maxConstraints: [number, number] = [
     parentSize.width > 0 ? parentSize.width - position.x : Infinity,
     parentSize.height > 0 ? parentSize.height - position.y : Infinity,
   ];
@@ -58,8 +65,8 @@ const ContentCard = ({ children }) => {
       handle=".drag-handle"
       nodeRef={nodeRef}
       bounds="parent"
-      position={position} // Control the position
-      onDrag={onDrag}     // Update position state on drag
+      position={position}
+      onDrag={onDrag}
     >
       <div
         ref={nodeRef}
@@ -71,7 +78,7 @@ const ContentCard = ({ children }) => {
           height={size.height}
           onResize={onResize}
           minConstraints={[200, 150]}
-          maxConstraints={maxConstraints} // Use dynamic constraints
+          maxConstraints={maxConstraints}
           resizeHandles={['se']}
           handle={
             <span

@@ -8,11 +8,12 @@ import "leaflet/dist/leaflet.css";
 import {
   LatLngExpression,
   StyleFunction,
-  Feature,
-  GeoJsonObject,
   LeafletMouseEvent,
   Layer,
 } from "leaflet";
+
+// Import GeoJSON types from 'geojson'
+import { Feature, GeoJsonObject } from "geojson";
 
 import { useState } from "react";
 
@@ -29,6 +30,20 @@ const Map = ({ geoJsonData }: MapProps) => {
     19.43264250944936,
     -99.1332122122233,
   ];
+  
+  // Style function
+  const style: StyleFunction = (feature?: Feature) => {
+    const isHighlighted =
+      feature?.properties?.nomgeo === highlightedAlcaldia;
+
+    return {
+      fillColor: "#d0d9d5",
+      weight: 2,
+      opacity: 1,
+      color: "white",
+      fillOpacity: isHighlighted ? 0.55 : 0.3,
+    };
+  };
 
   // Highlight feature
   const highlightFeature = (e: LeafletMouseEvent) => {
@@ -50,11 +65,11 @@ const Map = ({ geoJsonData }: MapProps) => {
     setHighlightedAlcaldia(null);
     const layer = e.target;
 
-    // Call style function again
+    // Reset the layer style by calling the original style function
     layer.setStyle(style(layer.feature));
   };
 
-  // Define feature behavior
+  // Define behavior for each feature
   const onEachFeature = (feature: Feature, layer: Layer) => {
     if (feature.properties && feature.properties.nomgeo) {
       layer.bindTooltip(feature.properties.nomgeo, {
@@ -65,25 +80,8 @@ const Map = ({ geoJsonData }: MapProps) => {
 
     layer.on({
       mouseover: highlightFeature,
-      mouseout: (e: LeafletMouseEvent) => {
-        const geoJsonLayer = e.target;
-        geoJsonLayer.setStyle(style(geoJsonLayer.feature));
-      },
+      mouseout: resetHighlight,
     });
-  };
-
-  // Style function
-  const style: StyleFunction = (feature?: Feature) => {
-    const isHighlighted =
-      feature?.properties?.nomgeo === highlightedAlcaldia;
-
-    return {
-      fillColor: "#d0d9d5",
-      weight: 2,
-      opacity: 1,
-      color: "white",
-      fillOpacity: isHighlighted ? 0.55 : 0.3,
-    };
   };
 
   return (
@@ -104,7 +102,6 @@ const Map = ({ geoJsonData }: MapProps) => {
           data={geoJsonData}
           style={style}
           onEachFeature={onEachFeature}
-          key={highlightedAlcaldia}
         />
       )}
     </MapContainer>

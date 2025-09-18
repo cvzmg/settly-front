@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import dynamic from "next/dynamic";
-import { GeoJsonObject } from "leaflet";
+import { GeoJsonObject } from "geojson";
 
 // Define the props that this component will accept
 interface MapLoaderProps {
