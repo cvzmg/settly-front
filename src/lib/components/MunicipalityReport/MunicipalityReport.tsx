@@ -18,7 +18,7 @@ return (
     <h1 className="text-3xl font-bold mb-4 px-1 text-gray-800 flex-shrink-0">{alcaldiaName}</h1>
     
     {/* Carousel container with explicit flex-grow and min-height */}
-    <div className="flex-grow min-h-0 mb-4">
+    <div className="flex-grow min-h-[15ch] mb-4">
       <ImageCarousel images={images} />
     </div>
     
